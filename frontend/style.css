@@ -1,0 +1,551 @@
+:root{
+  --bg-main:#02030a;
+  --bg-panel:rgba(8,12,28,0.92);
+  --bg-map:#030615;
+
+  --accent-cyan:#00f5ff;
+  --accent-magenta:#ff2bdc;
+  --accent-amber:#ffb020;
+
+  --text-main:#e6f1ff;
+  --text-muted:#7aa2f7;
+
+  --border:rgba(0,245,255,0.18);
+  --glow-cyan:rgba(0,245,255,0.45);
+  --glow-magenta:rgba(255,43,220,0.35);
+
+  --radius:16px;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"JetBrains Mono", monospace;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(circle at 20% 10%, #081a33, transparent 40%),
+    radial-gradient(circle at 80% 90%, #1a0033, transparent 45%),
+    linear-gradient(to bottom, #02030a, #010208);
+  color:var(--text-main);
+}
+
+/* ================= HEADER ================= */
+
+header{
+  padding:16px 10px;
+  text-align:center;
+  background:
+    linear-gradient(90deg,
+      transparent,
+      rgba(0,245,255,0.15),
+      rgba(255,43,220,0.15),
+      transparent);
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+
+header h1{
+  font-size:1.5rem;
+  letter-spacing:3px;
+  color:var(--accent-cyan);
+  text-shadow:
+    0 0 12px var(--glow-cyan),
+    0 0 30px rgba(0,245,255,0.25);
+}
+
+header span{
+  display:block;
+  margin-top:4px;
+  font-size:0.75rem;
+  color:var(--text-muted);
+}
+
+/* ================= MAIN ================= */
+
+main{
+  flex:1;
+  display:grid;
+  grid-template-columns:300px 1fr;
+}
+
+/* ================= ASIDE (TELEMETRY) ================= */
+
+aside{
+  padding:18px;
+  background:
+    linear-gradient(180deg,
+      rgba(10,18,45,0.95),
+      rgba(4,7,20,0.95));
+  border-right:1px solid var(--border);
+  box-shadow:
+    inset -1px 0 0 rgba(255,255,255,0.04);
+}
+
+aside h2{
+  font-size:0.85rem;
+  letter-spacing:2px;
+  color:var(--accent-amber);
+  margin-bottom:16px;
+}
+
+aside div{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 12px;
+  margin-bottom:12px;
+  background:
+    linear-gradient(135deg,
+      rgba(0,245,255,0.06),
+      rgba(255,43,220,0.04));
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:0.8rem;
+  position:relative;
+  overflow:hidden;
+}
+
+aside div::before{
+  content:"";
+  position:absolute;
+  left:-40%;
+  top:0;
+  width:40%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(0,245,255,0.25),
+    transparent);
+  transition:0.4s ease;
+}
+
+aside div:hover::before{
+  left:120%;
+}
+
+aside span{
+  color:var(--accent-cyan);
+  text-shadow:0 0 10px var(--glow-cyan);
+}
+
+/* ================= MAP ================= */
+
+#map{
+  width:100%;
+  height:100%;
+  background:var(--bg-map);
+  filter:
+    saturate(1.2)
+    contrast(1.1)
+    brightness(0.95);
+}
+
+/* ================= CHARTS ================= */
+
+.charts{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  padding:16px;
+  background:linear-gradient(to top, #010208, #02030a);
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.charts canvas{
+  height:260px !important;
+}
+
+
+canvas{
+  background:
+    linear-gradient(160deg,
+      rgba(8,14,40,0.95),
+      rgba(3,6,20,0.95));
+  border-radius:18px;
+  border:1px solid var(--border);
+  padding:14px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 0 35px var(--glow-magenta),
+    inset 0 0 30px rgba(0,0,0,0.6);
+  transition:0.3s ease;
+}
+
+canvas:hover{
+  transform:translateY(-4px);
+  box-shadow:
+    0 0 0 1px var(--accent-cyan),
+    0 0 60px var(--glow-cyan);
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+  text-align:center;
+  padding:8px;
+  font-size:0.7rem;
+  color:var(--text-muted);
+  border-top:1px solid var(--border);
+  background:#02030a;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+  main{
+    grid-template-columns:1fr;
+  }
+
+  aside{
+    border-right:none;
+    border-bottom:1px solid var(--border);
+  }
+
+  .charts{
+    grid-template-columns:1fr;
+  }
+}
+/* ===== MAP LABEL CLARITY ===== */
+
+.iss-label{
+  background:rgba(0,0,0,0.75);
+  color:#00f5ff;
+  border:1px solid rgba(0,245,255,0.6);
+  border-radius:6px;
+  padding:4px 8px;
+  font-size:0.7rem;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  box-shadow:
+    0 0 10px rgba(0,245,255,0.6),
+    inset 0 0 6px rgba(0,245,255,0.4);
+  pointer-events:none;
+}
+
+
+/* =========================================================
+   🔴 BLINKING ANOMALY STATES
+   ========================================================= */
+
+@keyframes anomalyBlink{
+  0%,100%{ box-shadow:0 0 10px rgba(255,50,50,0.4); }
+  50%{ box-shadow:0 0 28px rgba(255,50,50,0.9); }
+}
+
+.anomaly{
+  color:#ff4d4d !important;
+  animation:anomalyBlink 1.2s infinite;
+  border-color:rgba(255,50,50,0.6) !important;
+}
+
+/* JS se sirf class add karni hogi:
+   element.classList.add("anomaly")
+*/
+
+
+/* =========================================================
+   🌍 ORBITAL TRAIL GLOW (MAP OVERLAY EFFECT)
+   ========================================================= */
+
+/* .leaflet-overlay-pane svg path{
+  stroke:#00f5ff !important;
+  stroke-width:2.5 !important;
+  filter:drop-shadow(0 0 8px rgba(0,245,255,0.8))
+         drop-shadow(0 0 16px rgba(255,43,220,0.6));
+  animation:orbitPulse 2s infinite linear;
+} */
+
+@keyframes orbitPulse{
+  0%{ opacity:0.6; }
+  50%{ opacity:1; }
+  100%{ opacity:0.6; }
+}
+
+
+/* =========================================================
+   🧠 AI-GRADE DATA EMPHASIS (SMART FOCUS)
+   ========================================================= */
+
+aside div{
+  position:relative;
+}
+
+aside div::after{
+  content:"AI ANALYSIS";
+  position:absolute;
+  top:-8px;
+  right:10px;
+  font-size:0.55rem;
+  letter-spacing:1px;
+  color:#ff2bdc;
+  opacity:0;
+  transition:0.3s ease;
+}
+
+aside div:hover::after{
+  opacity:1;
+}
+
+aside span{
+  font-weight:600;
+  background:linear-gradient(90deg,#00f5ff,#ff2bdc);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+
+/* =========================================================
+   🛰️ SATELLITE ICON HUD EFFECT (MAP MARKER)
+   ========================================================= */
+
+@keyframes hudRotate{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+.iss-hud{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:2px solid #00f5ff;
+  box-shadow:
+    0 0 18px rgba(0,245,255,0.8),
+    inset 0 0 10px rgba(255,43,220,0.6);
+  position:relative;
+}
+
+.iss-hud::before{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+  border:1px dashed rgba(0,245,255,0.7);
+  animation:hudRotate 6s linear infinite;
+}
+
+.iss-hud::after{
+  content:"ISS";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.6rem;
+  color:#ffb020;
+}
+
+/* Leaflet marker element pe class add:
+   marker.getElement().classList.add("iss-hud");
+ */
+
+
+/* =========================================================
+   🧬 GLOBAL HUD MICRO-GRID (BACKGROUND DETAIL)
+   ========================================================= */
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.02) 0,
+      rgba(255,255,255,0.02) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.02) 0,
+      rgba(255,255,255,0.02) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+}
+/* =========================================================
+   🚨 AUTO-CRITICAL MODE VISUALS
+   ========================================================= */
+
+@keyframes criticalFlash{
+  0%,100%{ box-shadow:0 0 20px rgba(255,0,0,0.4); }
+  50%{ box-shadow:0 0 60px rgba(255,0,0,0.95); }
+}
+
+body.critical-mode header,
+body.critical-mode aside,
+body.critical-mode canvas{
+  border-color:rgba(255,0,0,0.6) !important;
+  animation:criticalFlash 1s infinite;
+}
+
+body.critical-mode header h1{
+  color:#ff3b3b;
+  text-shadow:
+    0 0 20px rgba(255,0,0,0.9),
+    0 0 40px rgba(255,0,0,0.6);
+}
+
+
+/* =========================================================
+   🌑 DAY–NIGHT EARTH TERMINATOR GLOW
+   ========================================================= */
+
+#map::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.85) 0%,
+      rgba(0,0,0,0.4) 35%,
+      rgba(255,255,255,0.05) 50%,
+      rgba(0,0,0,0.4) 65%,
+      rgba(0,0,0,0.85) 100%
+    );
+  mix-blend-mode:overlay;
+}
+
+#map{
+  position:relative;
+  overflow:hidden;
+}
+
+
+/* =========================================================
+   📡 SIGNAL-LOSS DISTORTION EFFECT
+   ========================================================= */
+
+@keyframes signalGlitch{
+  0%{ transform:translate(0); filter:hue-rotate(0deg); }
+  20%{ transform:translate(-2px,2px); }
+  40%{ transform:translate(2px,-1px); }
+  60%{ transform:translate(-1px,1px); filter:hue-rotate(40deg); }
+  80%{ transform:translate(1px,-2px); }
+  100%{ transform:translate(0); filter:hue-rotate(0deg); }
+}
+
+.signal-lost{
+  animation:signalGlitch 0.35s infinite;
+}
+
+.signal-lost canvas,
+.signal-lost #map,
+.signal-lost aside{
+  opacity:0.7;
+}
+
+.signal-lost::before{
+  content:"SIGNAL LOST";
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3rem;
+  letter-spacing:6px;
+  color:rgba(255,60,60,0.8);
+  background:rgba(0,0,0,0.55);
+  z-index:9999;
+}
+
+
+/* =========================================================
+   ⚡ HUD SCANLINE INTERFERENCE
+   ========================================================= */
+
+@keyframes scanMove{
+  from{ background-position:0 0; }
+  to{ background-position:0 100%; }
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.04) 0,
+      rgba(255,255,255,0.04) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  animation:scanMove 6s linear infinite;
+  mix-blend-mode:overlay;
+  opacity:0.25;
+}
+/* ================= GRAPH VISUAL FIX ================= */
+
+/* tighten chart section */
+.charts{
+  padding:12px 16px;
+  gap:14px;
+}
+
+/* FIX: reduce stretched height */
+.charts canvas{
+  height:220px !important;
+  max-height:220px;
+}
+
+/* chart container refinement */
+canvas{
+  padding:10px;
+  border-radius:14px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 18px rgba(0,245,255,0.18),
+    inset 0 0 18px rgba(0,0,0,0.6);
+}
+
+/* reduce hover exaggeration */
+canvas:hover{
+  transform:none;
+  box-shadow:
+    0 0 0 1px var(--accent-cyan),
+    0 0 22px rgba(0,245,255,0.35);
+}
+
+/* ================= MOBILE MAP VISIBILITY FIX ================= */
+
+@media (max-width:900px){
+  #map{
+    height:320px;        /* ensures map is visible */
+    min-height:320px;
+  }
+
+  main{
+    grid-auto-rows:auto;
+  }
+}
+@media (max-width:600px){
+  #map{
+    height:360px;
+  }
+}
+/* ===== ISS ORBIT PATH VISIBILITY ===== */
+
+/* ===== FINAL ISS ORBIT PATH (PURE BLACK) ===== */
+
+.leaflet-overlay-pane path{
+  stroke:#000000 !important;
+  stroke-width:3 !important;
+  stroke-opacity:0.9 !important;
+  fill:none !important;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:
+    drop-shadow(0 0 1px rgba(255,255,255,0.4));
+}
