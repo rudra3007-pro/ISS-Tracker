@@ -175,4 +175,4 @@ async function loadTelemetry(){
   }
 }
 
-setInterval(loadTelemetry,5000)
+setInterval(loadTelemetry,1000)
