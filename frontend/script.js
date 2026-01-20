@@ -9,34 +9,24 @@ const issIcon = L.icon({
 })
 
 let isFirstFix = true
+let followISS = true
+let backendOnline = true
 
-const issMarker = L.marker([0,0],{ icon:issIcon })
-.addTo(map)
-.bindTooltip("🛰 ISS",{
-  permanent:true,
-  direction:"right",
-  offset:[12,0],
-  className:"iss-label"
-})
-
-const track = L.polyline([],{
-  color:"#000000",
-  weight:3,
-  opacity:0.9,
-  smoothFactor:1
-}).addTo(map)
+const issMarker = L.marker([0,0],{icon:issIcon}).addTo(map)
+const track = L.polyline([], {color:"#38bdf8"}).addTo(map)
 
 let satrec = null
 
-/* ---------- LOAD TLE ---------- */
+/* ================= LOAD TLE ================= */
 
 async function loadTLE(){
   try{
-    const res = await fetch("/tle")
+    const res = await fetch("http://localhost:3000/tle")
     const tle = await res.json()
     satrec = satellite.twoline2satrec(tle.line1, tle.line2)
   }catch(e){
-    console.warn("TLE not available yet")
+    console.warn("Backend offline: TLE not loaded")
+    backendOnline = false
   }
 }
 
@@ -47,7 +37,7 @@ const lonEl = document.getElementById("lon")
 const altEl = document.getElementById("alt")
 const velEl = document.getElementById("vel")
 
-/* ---------- UPDATE ISS ---------- */
+/* ================= UPDATE ISS ================= */
 
 function updateISS(){
   if(!satrec) return
@@ -62,10 +52,6 @@ function updateISS(){
 
   const lat = satellite.degreesLat(geo.latitude)
   const lon = satellite.degreesLong(geo.longitude)
-
-  if(!Number.isFinite(lat) || !Number.isFinite(lon)) return
-  if(lat < -90 || lat > 90 || lon < -180 || lon > 180) return
-
   const alt = geo.height
   const vel = Math.sqrt(
     pv.velocity.x**2 +
@@ -76,34 +62,58 @@ function updateISS(){
   issMarker.setLatLng([lat,lon])
   track.addLatLng([lat,lon])
 
-  if(track.getLatLngs().length > 200)
-    track.setLatLngs([])
+  const pts = track.getLatLngs()
+  if(pts.length > 1){
+    const prev = pts[pts.length-2]
+    if(Math.abs(prev.lng - lon) > 180){
+      track.setLatLngs([])
+    }
+  }
 
   if(isFirstFix){
     map.setView([lat, lon], 4)
     isFirstFix = false
   }
 
+  if(followISS){
+    map.panTo([lat, lon], {
+      animate:true,
+      duration:1,
+      easeLinearity:0.25
+    })
+  }
+
+  if(track.getLatLngs().length > 200)
+    track.setLatLngs([])
+
   latEl.textContent = lat.toFixed(2)
   lonEl.textContent = lon.toFixed(2)
   altEl.textContent = alt.toFixed(1)
   velEl.textContent = vel.toFixed(2)
 
-  try{
-    fetch("/telemetry",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        time:now.toISOString(),
-        lat, lon, alt, vel
+  if(backendOnline){
+    try{
+      fetch("http://localhost:3000/telemetry",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({
+          time:now.toISOString(),
+          lat, lon, alt, vel
+        })
       })
-    })
-  }catch(e){}
+    }catch(e){
+      backendOnline = false
+    }
+  }
 }
 
 setInterval(updateISS,1000)
 
-/* ---------- CHARTS ---------- */
+map.on("dragstart zoomstart",()=>{
+  followISS = false
+})
+
+/* ================= CHARTS ================= */
 
 const altChart = new Chart(
   document.getElementById("altitudeChart"),
@@ -112,12 +122,11 @@ const altChart = new Chart(
     data:{ labels:[], datasets:[{
       label:"Altitude (km)",
       data:[],
-      borderColor:"#00f5ff",
-      borderWidth:2,
-      tension:0.35,
+      borderColor:"#38bdf8",
+      tension:0.3,
       pointRadius:0
     }]},
-    options:{ animation:false, maintainAspectRatio:false }
+    options:{ animation:false }
   }
 )
 
@@ -128,32 +137,35 @@ const velChart = new Chart(
     data:{ labels:[], datasets:[{
       label:"Velocity (km/s)",
       data:[],
-      borderColor:"#ffb020",
-      borderWidth:2,
-      tension:0.35,
+      borderColor:"#f59e0b",
+      tension:0.3,
       pointRadius:0
     }]},
-    options:{ animation:false, maintainAspectRatio:false }
+    options:{ animation:false }
   }
 )
 
-/* ---------- LOAD TELEMETRY ---------- */
+/* ================= LOAD TELEMETRY ================= */
 
 async function loadTelemetry(){
+  if(!backendOnline) return
+
   try{
-    const res = await fetch("/telemetry")
+    const res = await fetch("http://localhost:3000/telemetry")
     const data = await res.json()
 
-    const labels = data.map(d => d.time.slice(11,19))
+    const labels = data.map(d=>d.time.slice(11,19))
 
     altChart.data.labels = labels
-    altChart.data.datasets[0].data = data.map(d => d.alt)
+    altChart.data.datasets[0].data = data.map(d=>d.alt)
     altChart.update()
 
     velChart.data.labels = labels
-    velChart.data.datasets[0].data = data.map(d => d.vel)
+    velChart.data.datasets[0].data = data.map(d=>d.vel)
     velChart.update()
-  }catch(e){}
+  }catch(e){
+    backendOnline = false
+  }
 }
 
 setInterval(loadTelemetry,5000)
