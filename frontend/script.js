@@ -37,17 +37,23 @@ const lonEl = document.getElementById("lon")
 const altEl = document.getElementById("alt")
 const velEl = document.getElementById("vel")
 
+/* ================= SIMULATION TIME (ADDED) ================= */
+
+let simTime = new Date()
+const TIME_STEP_MS = 1000
+
+
 /* ================= UPDATE ISS ================= */
 
 function updateISS(){
   if(!satrec) return
 
-  const now = new Date()
-  const pv = satellite.propagate(satrec, now)
+  simTime = new Date(simTime.getTime() + TIME_STEP_MS)
+  const pv = satellite.propagate(satrec, simTime)
 
   if(!pv.position || !pv.velocity) return
 
-  const gmst = satellite.gstime(now)
+  const gmst = satellite.gstime(simTime)
   const geo = satellite.eciToGeodetic(pv.position, gmst)
 
   const lat = satellite.degreesLat(geo.latitude)
@@ -77,10 +83,11 @@ function updateISS(){
 
   if(followISS){
     map.panTo([lat, lon], {
-      animate:true,
-      duration:1,
-      easeLinearity:0.25
-    })
+  animate: true,
+  duration: 0.25,
+  easeLinearity: 0.25
+})
+
   }
 
   if(track.getLatLngs().length > 200)
@@ -88,8 +95,8 @@ function updateISS(){
 
   latEl.textContent = lat.toFixed(2)
   lonEl.textContent = lon.toFixed(2)
-  altEl.textContent = alt.toFixed(1)
-  velEl.textContent = vel.toFixed(2)
+  altEl.textContent = alt.toFixed(2)
+  velEl.textContent = vel.toFixed(5)
 
   if(backendOnline){
     try{
@@ -97,7 +104,7 @@ function updateISS(){
         method:"POST",
         headers:{ "Content-Type":"application/json" },
         body:JSON.stringify({
-          time:now.toISOString(),
+          time:simTime.toISOString(),
           lat, lon, alt, vel
         })
       })
@@ -107,7 +114,7 @@ function updateISS(){
   }
 }
 
-setInterval(updateISS,1000)
+setInterval(updateISS,250)
 
 map.on("dragstart zoomstart",()=>{
   followISS = false
