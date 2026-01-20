@@ -46,6 +46,7 @@ const TIME_STEP_MS = 1000
 /* ================= UPDATE ISS ================= */
 
 function updateISS(){
+
   if(!satrec) return
 
   simTime = new Date(simTime.getTime() + TIME_STEP_MS)
@@ -64,6 +65,8 @@ function updateISS(){
     pv.velocity.y**2 +
     pv.velocity.z**2
   )
+    console.log(alt, vel)
+
 
   issMarker.setLatLng([lat,lon])
   track.addLatLng([lat,lon])
@@ -84,9 +87,10 @@ function updateISS(){
   if(followISS){
     map.panTo([lat, lon], {
   animate: true,
-  duration: 0.25,
+  duration: 0.3,
   easeLinearity: 0.25
 })
+
 
   }
 
@@ -116,9 +120,7 @@ function updateISS(){
 
 setInterval(updateISS,250)
 
-map.on("dragstart zoomstart",()=>{
-  followISS = false
-})
+
 
 /* ================= CHARTS ================= */
 
