@@ -1,3 +1,5 @@
+const API_URL = "https://iss-backend-nf40.onrender.com"
+
 const map = L.map("map").setView([20,0],2)
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
@@ -21,7 +23,7 @@ let satrec = null
 
 async function loadTLE(){
   try{
-    const res = await fetch("http://localhost:3000/tle")
+    const res = await fetch(`${API_URL}/tle`)
     const tle = await res.json()
     satrec = satellite.twoline2satrec(tle.line1, tle.line2)
   }catch(e){
@@ -37,11 +39,10 @@ const lonEl = document.getElementById("lon")
 const altEl = document.getElementById("alt")
 const velEl = document.getElementById("vel")
 
-/* ================= SIMULATION TIME (ADDED) ================= */
+/* ================= SIMULATION TIME ================= */
 
 let simTime = new Date()
 const TIME_STEP_MS = 1000
-
 
 /* ================= UPDATE ISS ================= */
 
@@ -65,8 +66,6 @@ function updateISS(){
     pv.velocity.y**2 +
     pv.velocity.z**2
   )
-    console.log(alt, vel)
-
 
   issMarker.setLatLng([lat,lon])
   track.addLatLng([lat,lon])
@@ -86,12 +85,10 @@ function updateISS(){
 
   if(followISS){
     map.panTo([lat, lon], {
-  animate: true,
-  duration: 0.3,
-  easeLinearity: 0.25
-})
-
-
+      animate:true,
+      duration:0.3,
+      easeLinearity:0.25
+    })
   }
 
   if(track.getLatLngs().length > 200)
@@ -104,7 +101,7 @@ function updateISS(){
 
   if(backendOnline){
     try{
-      fetch("http://localhost:3000/telemetry",{
+      fetch(`${API_URL}/telemetry`,{
         method:"POST",
         headers:{ "Content-Type":"application/json" },
         body:JSON.stringify({
@@ -120,8 +117,6 @@ function updateISS(){
 
 setInterval(updateISS,250)
 
-
-
 /* ================= CHARTS ================= */
 
 const altChart = new Chart(
@@ -131,7 +126,6 @@ const altChart = new Chart(
     data:{ labels:[], datasets:[{
       label:"Altitude (km)",
       data:[],
-      borderColor:"#38bdf8",
       tension:0.3,
       pointRadius:0
     }]},
@@ -146,7 +140,6 @@ const velChart = new Chart(
     data:{ labels:[], datasets:[{
       label:"Velocity (km/s)",
       data:[],
-      borderColor:"#f59e0b",
       tension:0.3,
       pointRadius:0
     }]},
@@ -160,7 +153,7 @@ async function loadTelemetry(){
   if(!backendOnline) return
 
   try{
-    const res = await fetch("http://localhost:3000/telemetry")
+    const res = await fetch(`${API_URL}/telemetry`)
     const data = await res.json()
 
     const labels = data.map(d=>d.time.slice(11,19))
